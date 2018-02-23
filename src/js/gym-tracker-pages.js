@@ -102,17 +102,27 @@ const TrainingPageExerciseListSection = {
               <div class="exercise-set-input"></div>
             </li>`;
   },
-  exercisesList(exercises) {
+  exercisesList(exercises, onStateUpdate) {
     let list = $.parseHTML('<ul class="exercise-list"></ul>');
     exercises.forEach((exercise, index) => {
       const liElement = $.parseHTML(this.exerciseListItemHTML(exercise));
-      const exerciseSetFormOptions = {onSubmitForm: EventHandler.onSaveAddSetForExercise(index)};
-      if (exercise.displayExerciseSetInputForm) {
-        Object.assign(exerciseSetFormOptions, {
+      let exerciseSetFormOptions = {};
+      if (exercise.updateExerciseSet !== undefined) {
+        exerciseSetFormOptions = {
           displayInputForm: true,
           exerciseSet: exercise.updateExerciseSet.set,
-          onSubmitUpdateForm: EventHandler.onUpdateExerciseSetSubmitForm(exercise.updateExerciseSet.setId)});
-        exercise.displayExerciseSetInputForm = false;
+          saveButtonLabel: 'Update Exercise',
+          onCancel: () => {
+            exercise.updateExerciseSet = false; 
+            onStateUpdate();
+          },
+          onSubmitForm: EventHandler.onUpdateExerciseSetSubmitForm(exercise.updateExerciseSet.setId).then(() => exercise.updateExerciseSet = false); onStateUpdate();};
+      } else {
+        exerciseSetFormOptions = {
+          displayInputForm: false,
+          saveButtonLabel: 'Save New Exercise'
+          onSubmitForm: EventHandler.onSaveAddSetForExercise(index)
+        };
       }
       const exerciseSetForm = new ExerciseSetInputForm(exerciseSetFormOptions);
       const addExerciseSetDiv = $(liElement).find('.exercise-set-input');
@@ -125,7 +135,7 @@ const TrainingPageExerciseListSection = {
     return list;
   },
   render(props) {
-    return this.exercisesList(props.exercises)
+    return this.exercisesList(props.exercises, () => render(props))
   }
 };
 
@@ -182,6 +192,6 @@ const HomePage = {
 };
 
 export { SelectTrainingSessionSection, HomePage,
-         TrainingPageHeadingSection, TrainingPageChangeSessionSection,
-         TrainingPageAddExerciseSection, TrainingPageStaticContent,
-         TrainingPageExerciseListSection };
+  TrainingPageHeadingSection, TrainingPageChangeSessionSection,
+  TrainingPageAddExerciseSection, TrainingPageStaticContent,
+  TrainingPageExerciseListSection };

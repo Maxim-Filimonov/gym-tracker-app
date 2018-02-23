@@ -79,7 +79,6 @@ const EventHandler = {
   },
   onEditExerciseSetButtonClick: function (exerciseIndex) {
     return (exerciseSetId, exerciseSet) => {
-      State.trainingSessionExercises[exerciseIndex].displayExerciseSetInputForm = true;
       State.trainingSessionExercises[exerciseIndex].updateExerciseSet = {
         setId: exerciseSetId,
         set: exerciseSet
